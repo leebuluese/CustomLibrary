@@ -98,14 +98,20 @@ public class LongBitmapActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void makeLongPic(List<Bitmap> list) {
+        Bitmap longBit = null;
         for (Bitmap bitmap : list) {
-
+            longBit = createBitmap(bitmap, longBit);
 
         }
+
+
     }
 
-    private void createBitmap(Bitmap bitOne, Bitmap bitTwo) {
+    private Bitmap createBitmap(Bitmap bitOne, Bitmap bitTwo) {
 
+        Bitmap newBit = mixBitmap(bitOne);
+
+        return null;
     }
 
     private Bitmap mixBitmap(Bitmap bitmap) {
