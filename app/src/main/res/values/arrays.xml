@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="main_list">
+        <item>图片</item>
+        <item>App信息</item>
+    </string-array>
+
+    <string-array name="list_bitmap">
+        <item>图片水印</item>
+        <item>长图拼接</item>
+    </string-array>
+</resources>
