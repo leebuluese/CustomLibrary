@@ -18,11 +18,29 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name="me.iwf.photopicker.PhotoPickerActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+
+        <activity
+            android:name="me.iwf.photopicker.PhotoPagerActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+
         <activity
             android:name=".kotlin.KotlinJNIActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".bitmap.BitmapActivity" />
-        <activity android:name=".bitmap.longbitmap.LongBitmapActivity"></activity>
+
+        <activity
+            android:name=".bitmap.BitmapActivity"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".bitmap.longbitmap.LongBitmapActivity"
+            android:screenOrientation="portrait" />
+
     </application>
 
 </manifest>

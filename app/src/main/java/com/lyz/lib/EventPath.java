@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import com.lyz.lib.bitmap.BitmapActivity;
+import com.lyz.lib.bitmap.longbitmap.LongBitmapActivity;
 
 /**
  * Created by lyz on 2018/8/14.
@@ -50,7 +51,7 @@ public class EventPath {
 
                     break;
                 case 1:
-
+                    intent.setClass(context, LongBitmapActivity.class);
                     break;
                 default:
                     break;

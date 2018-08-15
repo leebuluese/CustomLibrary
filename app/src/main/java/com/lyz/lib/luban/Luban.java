@@ -12,7 +12,7 @@ import android.support.annotation.WorkerThread;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.lyz.longbitmap.util.PhotoUtil;
+import com.lyz.lib.util.PhotoUtil;
 
 import java.io.File;
 import java.io.IOException;

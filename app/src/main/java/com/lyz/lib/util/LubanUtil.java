@@ -94,7 +94,7 @@ public class LubanUtil {
      * 获取指定缓存路径
      * @return 创建路径
      */
-    private static String getDirectoryPath(String fileName) {
+    public static String getDirectoryPath(String fileName) {
         String path = Environment.getExternalStorageDirectory() + fileName;
         File file = new File(path);
         if (file.mkdirs()) {
