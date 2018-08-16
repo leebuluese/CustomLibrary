@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import me.iwf.photopicker.PhotoPicker;
+import me.iwf.photopicker.utils.GlideUtil;
 
 public class LongBitmapActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -39,6 +40,7 @@ public class LongBitmapActivity extends AppCompatActivity implements View.OnClic
     private RecyclerView rvPhotos;
     private LongBitmapAdapter bitmapAdapter;
     private List<Bitmap> newBitList;
+    private ImageView ivLong;
 
 
     @Override
@@ -69,7 +71,7 @@ public class LongBitmapActivity extends AppCompatActivity implements View.OnClic
         rvPhotos = findViewById(R.id.rv_photos);
         rvPhotos.setLayoutManager(new LinearLayoutManager(this));
 
-
+        ivLong = findViewById(R.id.iv_long);
     }
 
 
@@ -99,7 +101,6 @@ public class LongBitmapActivity extends AppCompatActivity implements View.OnClic
                 ArrayList<String> photos = data.getStringArrayListExtra(PhotoPicker.KEY_SELECTED_PHOTOS);
                 compressPhoto(photos);
             }
-
         }
     }
 
@@ -118,6 +119,40 @@ public class LongBitmapActivity extends AppCompatActivity implements View.OnClic
         });
     }
 
+    private void makeLongPic(List<Bitmap> list) {
+        List<Bitmap> mixBitmaps = new ArrayList<>();
+        List<Integer> longHeights = new ArrayList<>();
+        int mHeight = 0;
+        for (Bitmap bitmap : list) {
+            Bitmap mixBitmap = mixBitmap(bitmap);
+            if (null != mixBitmap) {
+                mixBitmaps.add(mixBitmap);
+                longHeights.add(mixBitmap.getHeight());
+                mHeight+=mixBitmap.getHeight();
+            }
+        }
+        Bitmap bitmap = Bitmap.createBitmap(screenWidth, mHeight, Bitmap.Config.ARGB_4444);
+        Canvas canvas = new Canvas(bitmap);
+        int addHeight = 0;
+        for (int i = 0; i < mixBitmaps.size(); i++) {
+            if (i == 0) {
+                canvas.drawBitmap(mixBitmaps.get(i), 0, 0, null);
+            } else {
+                addHeight+=longHeights.get(i - 1);
+                canvas.drawBitmap(mixBitmaps.get(i), 0, addHeight, null);
+            }
+        }
+        File file = PhotoUtil.getFileFromBitmap(LubanUtil.getDirectoryPath(PhotoUtil.CACHE_FILE_NAME), bitmap);
+        long size = file.length() >> 10;
+        Log.e(TAG, "makeLongPic2   size = " + size);
+        String path = file.getAbsolutePath();
+        Log.e(TAG, "makeLongPic2   path = " + path);
+        showBitmap(mixBitmaps);
+        GlideUtil.loadImg(this, ivLong, path);
+
+
+    }
+
     private void showBitmap(List<Bitmap> bitmap) {
 
         if (null == bitmapAdapter) {
@@ -128,58 +163,6 @@ public class LongBitmapActivity extends AppCompatActivity implements View.OnClic
             bitmapAdapter.setData(bitmap);
             bitmapAdapter.notifyDataSetChanged();
         }
-    }
-
-    private void makeLongPic(List<Bitmap> list) {
-        Bitmap longBit = null;
-        newBitList = new ArrayList<>();
-        for (Bitmap bitmap : list) {
-            longBit = createBitmap(bitmap, longBit);
-        }
-        File file = PhotoUtil.getFileFromBitmap(LubanUtil.getDirectoryPath(PhotoUtil.CACHE_FILE_NAME), longBit);
-        long size = file.length() >> 10;
-        Log.e(TAG, "makeLongPic   size = " + size);
-        showBitmap(newBitList);
-    }
-
-    private Bitmap createBitmap(Bitmap bitOne, Bitmap bitTwo) {
-        Bitmap resultBit = null;
-        if (null == bitTwo) {
-            resultBit = mixBitmap(bitOne);
-            newBitList.add(mixBitmap(bitOne));
-        } else {
-            Bitmap bitNew = mixBitmap(bitOne);
-            newBitList.add(bitNew);
-            if (bitNew != null) {
-                int heightOne = bitNew.getHeight();
-                int widthOne = bitNew.getWidth();
-                int heightTwo = bitTwo.getHeight();
-                int widthTwo = bitTwo.getWidth();
-                int totalHeight = heightOne + heightTwo;
-                Log.e(TAG, "createBitmap  heightOne = " + heightOne +
-                        " ; heightTwo = " + heightTwo +
-                        " ; totalHeight = " + totalHeight +
-                        " ; widthOne = " + widthOne +
-                        " ; widthTwo = " + widthTwo);
-                try {
-                    Bitmap bitmap = Bitmap.createBitmap(screenWidth, totalHeight, Bitmap.Config.ARGB_4444);
-                    Canvas canvas = new Canvas(bitmap);
-                    canvas.drawBitmap(bitTwo, 0, 0, null);
-                    canvas.drawBitmap(bitNew, 0, heightTwo, null);
-                    if (!bitTwo.isRecycled()) {
-                        bitTwo.recycle();
-                    }
-//                    System.gc();
-                    resultBit = bitmap;
-                } catch (Exception e) {
-                    Log.e(TAG, "drawBitmap e = " + e);
-                }
-            }
-        }
-        if (resultBit == null) {
-            Log.e(TAG, "createBitmap   resultBit = null");
-        }
-        return resultBit;
     }
 
     private Bitmap mixBitmap(Bitmap bitmap) {

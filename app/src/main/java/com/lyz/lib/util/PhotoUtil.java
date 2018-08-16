@@ -15,8 +15,13 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.util.Log;
+import android.widget.ListView;
+import android.widget.ScrollView;
+
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -333,5 +338,60 @@ public class PhotoUtil {
         }
         //恢复画布状态
         canvas.restore();
+    }
+
+    /**
+     * 截取scrollview的屏幕
+     **/
+    public static Bitmap getScrollViewBitmap(ScrollView scrollView) {
+        int h = 0;
+        Bitmap bitmap;
+        for (int i = 0; i < scrollView.getChildCount(); i++) {
+            h += scrollView.getChildAt(i).getHeight();
+        }
+        // 创建对应大小的bitmap
+
+        bitmap = Bitmap.createBitmap(DensityUtil.getScreenWidth(scrollView.getContext()), h,
+                Bitmap.Config.ARGB_4444);
+        final Canvas canvas = new Canvas(bitmap);
+        canvas.drawColor(Color.parseColor("#f2f7fa"));
+        scrollView.draw(canvas);
+        return bitmap;
+    }
+
+    /**
+     * 截图listview
+     **/
+    public static Bitmap getListViewBitmap(ListView listView, String picpath) {
+        int h = 0;
+        Bitmap bitmap;
+        // 获取listView实际高度
+        for (int i = 0; i < listView.getChildCount(); i++) {
+            h += listView.getChildAt(i).getHeight();
+        }
+        listView.getHeight();
+        // 创建对应大小的bitmap
+        bitmap = Bitmap.createBitmap(listView.getWidth(), h,
+                Bitmap.Config.RGB_565);
+        final Canvas canvas = new Canvas(bitmap);
+        canvas.drawColor(Color.WHITE);
+        listView.draw(canvas);
+        // 测试输出
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream(picpath);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        try {
+            if (null != out) {
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+                out.flush();
+                out.close();
+            }
+        } catch (IOException e) {
+            Log.e("PhotoUtil", "getListViewBitmap e = " + e);
+        }
+        return bitmap;
     }
 }
