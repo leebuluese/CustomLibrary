@@ -15,6 +15,7 @@ import me.iwf.photopicker.glide.GlideApp;
 
 /**
  * Created by lyz on 2018/7/11.
+ *
  */
 
 public class GlideUtil {
