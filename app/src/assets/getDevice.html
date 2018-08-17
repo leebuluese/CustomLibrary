@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>设备搜索</title>
+    <!--<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">-->
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <!--<meta http-equiv="Pragma" content="no-cache">-->
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"></script>
+    <script src="https://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+
+
+    <style>
+        html, body {width: 100%;height: 100%;margin: 0;padding: 0;}
+        #mapId {height: 100%;width: 100%;background-color: #f5f5f5;}
+        #mapId .leaflet-overlay-pane .leaflet-image-layer{background-color: #f5f5f5;}
+        #mapId .leaflet-control-container .leaflet-control-attribution{display: none;}
+    </style>
+</head>
+<body>
+<div id="mapId"></div>
+
+<script>
+    let stationId = getQueryString('id');//电站ID
+    let ip = getQueryString('ip');//ip
+    let map = null,layerGroup = null;
+    let mapWidth = 6263  ,mapHeight = 3463;
+
+
+    //获取url参数
+    function getQueryString(name) {
+        let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        let r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]);
+        return null;
+    }
+
+    $(function () {
+
+        initMap();
+
+
+        // 发送消息到Android客户端
+        function sendInfoToJava(msg=null) {
+            //调用android程序中的方法，并传递参数
+            window.AndroidWebView.showInfoFromJs(msg);
+        }
+
+        //在Android代码中调用此方法,不传递信息
+        function getSelectedData(data) {
+            alert('app 调用')
+            alert(data)
+            // data = '[{"deviceId":18607,"deviceNo":4444,"height":311,"pvBarcode":"ffwfwerwr","pvStringName":"ZC0102","pvstringId":1,"solarId":1,"solarX":62,"solarY":124,"width":184}]';
+            let selectedData = JSON.parse(data);
+            if(data===0){//啥都没有选   --->清空 并重新加载
+                layerGroup.clearLayers();
+                getZujianData(stationId);
+            }else{//有选中   --->高亮选中项
+                let allPolygons = layerGroup.getLayers();
+                allPolygons.forEach((polygon)=>{
+                    selectedData.forEach((selectItem)=>{
+                        if (selectItem.solarId === polygon.options.data.solarId){
+                            // polygon.options.data = selectItem;
+                            polygon.setStyle({
+                                color: '#41abfc',
+                                fillColor:'#41abfc',
+                            });
+                            map.panTo(xy(selectItem.solarX , mapHeight-selectItem.solarY));
+                        }
+                    });
+                });
+            }
+        }
+
+
+
+
+        //坐标系转换[y,x] ---> [x,y] ,用于输入
+        function xy(x,y){
+            let yx = L.latLng;
+            if (L.Util.isArray(x)) {    // When doing xy([x, y]);
+                return yx(x[1], x[0]);
+            }
+            return yx(y, x);  // When doing xy(x, y);
+        }
+
+
+        //左上角坐标系 ---> 地图里面的左下角坐标系(left bottom coordinates system)
+        function LBCS(x,y){//(x,y)左上角坐标系的点
+            return xy(x, mapHeight-y);
+        }
+
+
+
+        //初始化地图
+        function initMap() {
+            map = L.map('mapId', {
+                crs: L.CRS.Simple,
+                maxZoom: 5,
+                minZoom: -5,
+            });
+            let bounds = [[0, 0], xy(mapWidth, mapHeight)];
+            let image = L.imageOverlay('array.png', bounds).addTo(map);
+            map.fitBounds(bounds);
+            map.setView(xy(mapWidth/2, mapHeight/2), -3); // 设置地图中心位置，默认放大倍数
+
+            getZujianData(stationId);
+        }
+
+
+
+        //获取阵列图数据
+        function getZujianData(stationId) {
+            layerGroup = L.layerGroup([]).addTo(map);
+            $.ajax({
+                type: "POST",
+                url: "../../wcsolar/app/station/getSolarAll",
+                data: {stationId :stationId},
+                dataType: "json",
+                success: function (obj) {
+                    if(obj.code !== 0) return;
+                    obj.data.forEach((v)=>{
+                        let points = [LBCS(v.solarX, v.solarY),LBCS(v.solarX, v.solarY+v.height),LBCS(v.solarX+v.width, v.solarY+v.height),LBCS(v.solarX+v.width, v.solarY)];
+                        let polygon = L.polygon(points,{
+                            color: v.deviceId === -1 ? '#999' : '#fff',
+                            fillColor: v.deviceId === -1 ? '#999' : '#fff',
+                            fillOpacity: .6,
+                            data:v,
+                        }).addTo(map);
+                        polygon.on('click',polygonClick);
+                        layerGroup.addLayer(polygon);
+                    })
+                },
+                error: function (msg) {
+                    alert('ERROR')
+                }
+            });
+        }
+
+
+
+        //polygon点击事件
+        function polygonClick(e){
+           let data = e.target.options.data;
+            map.fitBounds(e.target.getBounds());// zoom the map to the polygon
+            sendInfoToJava(JSON.stringify(data));//todo for android
+        }
+
+    });
+</script>
+</body>
+</html>
