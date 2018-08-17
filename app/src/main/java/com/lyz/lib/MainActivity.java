@@ -23,7 +23,6 @@ public class MainActivity extends AppCompatActivity {
         List<String> mainList = (List<String>) Arrays.asList(mainArray);
         ListAdapter mainListAdapter = new ListAdapter(this);
         mainListAdapter.setData(mainList);
-        //TODO Tim is a dog.
         rv.setAdapter(mainListAdapter);
     }
 }
