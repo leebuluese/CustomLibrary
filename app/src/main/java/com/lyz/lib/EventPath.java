@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import com.lyz.lib.bitmap.BitmapActivity;
 import com.lyz.lib.bitmap.longbitmap.LongBitmapActivity;
+import com.lyz.lib.view.ViewActivity;
 
 /**
  * Created by lyz on 2018/8/14.
@@ -12,6 +13,7 @@ import com.lyz.lib.bitmap.longbitmap.LongBitmapActivity;
  */
 
 public class EventPath {
+
 
     private Context context;
     private int position;
@@ -42,6 +44,9 @@ public class EventPath {
                 case 1:
 
                     break;
+                case 2:
+                    intent.setClass(context, ViewActivity.class);
+                    break;
                 default:
                     break;
             }
@@ -52,6 +57,9 @@ public class EventPath {
                     break;
                 case 1:
                     intent.setClass(context, LongBitmapActivity.class);
+                    break;
+                case 2:
+
                     break;
                 default:
                     break;
