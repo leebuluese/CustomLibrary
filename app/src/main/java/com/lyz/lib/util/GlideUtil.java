@@ -1,4 +1,4 @@
-package me.iwf.photopicker.utils;
+package com.lyz.lib.util;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -9,9 +9,9 @@ import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
+import com.lyz.lib.R;
+import com.lyz.lib.glide.GlideApp;
 
-import me.iwf.photopicker.R;
-import me.iwf.photopicker.glide.GlideApp;
 
 /**
  * Created by lyz on 2018/7/11.
@@ -21,9 +21,9 @@ import me.iwf.photopicker.glide.GlideApp;
 public class GlideUtil {
 
     private static RequestOptions requestOptions = new RequestOptions()
-            .placeholder(R.drawable.ic_launcher_round) //加载中图片
-            .error(R.drawable.ic_launcher_round) //加载失败图片
-            .fallback(R.drawable.ic_launcher_round) //url为空图片
+            .placeholder(R.drawable.ic_launcher_background) //加载中图片
+            .error(R.drawable.ic_launcher_background) //加载失败图片
+            .fallback(R.drawable.ic_launcher_background) //url为空图片
 //            .centerCrop() // 填充方式
 //            .override(600,600) //尺寸
 //            .transform(new CircleCrop()) //圆角
@@ -36,6 +36,6 @@ public class GlideUtil {
     }
 
     public static void loadAllImg(@NonNull Context context, ImageView view, String url){
-        GlideApp.with(context).load(url).diskCacheStrategy(DiskCacheStrategy.ALL).error(R.drawable.ic_launcher_round).placeholder(R.drawable.ic_launcher_round).into(view);
+        GlideApp.with(context).load(url).diskCacheStrategy(DiskCacheStrategy.ALL).error(R.drawable.ic_launcher_background).placeholder(R.drawable.ic_launcher_background).into(view);
     }
 }

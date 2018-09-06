@@ -1,5 +1,6 @@
 package com.lyz.lib.util;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -93,10 +94,10 @@ public class PhotoUtil {
      * File 转 Uri
      */
     public Uri fileTurnUri(File file) {
-        return  Uri.fromFile(file);
+        return Uri.fromFile(file);
     }
 
-    public Uri FileTurnUri(String filePath){
+    public Uri FileTurnUri(String filePath) {
         File f = new File(filePath);
         return Uri.fromFile(f);
     }
@@ -106,7 +107,7 @@ public class PhotoUtil {
         Uri mediaUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
         Cursor cursor = context.getContentResolver().query(mediaUri, null,
                 MediaStore.Images.Media.DISPLAY_NAME + "= ?",
-                new String[] {path.substring(path.lastIndexOf("/") + 1)},
+                new String[]{path.substring(path.lastIndexOf("/") + 1)},
                 null);
 
         Uri uri = null;
@@ -127,8 +128,8 @@ public class PhotoUtil {
     public String getRealPathFromUri(Context context, Uri contentUri) {
         Cursor cursor = null;
         try {
-            String[] proj = { MediaStore.Images.Media.DATA };
-            cursor = context.getContentResolver().query(contentUri,  proj, null, null, null);
+            String[] proj = {MediaStore.Images.Media.DATA};
+            cursor = context.getContentResolver().query(contentUri, proj, null, null, null);
             int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
             cursor.moveToFirst();
             return cursor.getString(column_index);
@@ -166,6 +167,7 @@ public class PhotoUtil {
 
     /**
      * 4.4以前
+     *
      * @param context
      * @param uri
      */
@@ -175,6 +177,7 @@ public class PhotoUtil {
 
     /**
      * 4.4以后
+     *
      * @param context
      * @param uri
      */
@@ -221,6 +224,7 @@ public class PhotoUtil {
      * 优化算法
      * 1.图片不需要铺满，只需要以统一合适的宽度。然后让ImageView自己去铺满，不然长图合成长图会崩溃，这里以第一张图为例
      * 2.只缩放不相等宽度的图片。已经缩放过的不需要再次缩放
+     *
      * @param bit1
      * @param bit2
      * @return
@@ -246,7 +250,6 @@ public class PhotoUtil {
 
 
     /**
-     *
      * @param bitmap
      * @param newWidth
      * @param newHeight
@@ -265,6 +268,7 @@ public class PhotoUtil {
 
     /**
      * 添加logo水印
+     *
      * @param src
      * @param logo
      * @return
@@ -302,8 +306,9 @@ public class PhotoUtil {
 
     /**
      * 添加文字水印
+     *
      * @param context
-     * @param logo          要添加的文字
+     * @param logo    要添加的文字
      * @param canvas
      * @param width
      * @param height
@@ -394,4 +399,50 @@ public class PhotoUtil {
         }
         return bitmap;
     }
+
+    /**
+     * 解决小米手机上获取图片路径为null的情况
+     *
+     * @param intent
+     * @return
+     */
+    public Uri geturi(android.content.Intent intent, Context context) {
+        if (null == intent || null == intent.getData() || null == intent.getType()) return null;
+        Uri uri = intent.getData();
+        String type = intent.getType();
+        if (uri.getScheme().equals("file") && (type.contains("image/"))) {
+            String path = uri.getEncodedPath();
+            if (path != null) {
+                path = Uri.decode(path);
+                ContentResolver cr = context.getContentResolver();
+                @SuppressLint("Recycle")
+                Cursor cur = cr.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                        new String[]{MediaStore.Images.ImageColumns._ID},
+                        "(" + MediaStore.Images.ImageColumns.DATA + "=" + "'" + path + "'" + ")", null, null);
+                int index = 0;
+                if (null != cur) {
+                    for (cur.moveToFirst(); !cur.isAfterLast(); cur.moveToNext()) {
+                        index = cur.getColumnIndex(MediaStore.Images.ImageColumns._ID);
+                        //set _id value
+                        index = cur.getInt(index);
+                    }
+                }
+                if (index != 0) {
+                    // do nothing
+                    Uri uri_temp = Uri
+                            .parse("content://media/external/images/media/"
+                                    + index);
+                    if (uri_temp != null) {
+                        uri = uri_temp;
+                    }
+                }
+                if (null != cur) {
+                    cur.close();
+                }
+            }
+        }
+        return uri;
+    }
+
+
 }

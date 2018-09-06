@@ -19,7 +19,12 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.luck.picture.lib.PictureSelector;
+import com.luck.picture.lib.config.PictureConfig;
+import com.luck.picture.lib.entity.LocalMedia;
 import com.lyz.lib.R;
+import com.lyz.lib.bitmap.asciibitmap.AsciiBitmapActivity;
+import com.lyz.lib.bitmap.asciibitmap.AsciiUtil;
 import com.lyz.lib.util.LubanUtil;
 import com.lyz.lib.util.PhotoUtil;
 
@@ -27,8 +32,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import me.iwf.photopicker.PhotoPicker;
-import me.iwf.photopicker.utils.GlideUtil;
+import com.lyz.lib.util.GlideUtil;
 
 public class LongBitmapActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -79,12 +83,13 @@ public class LongBitmapActivity extends AppCompatActivity implements View.OnClic
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_add:
-                PhotoPicker.builder()
-                        .setPhotoCount(9)
-                        .setShowCamera(true)
-                        .setShowGif(true)
-                        .setPreviewEnabled(false)
-                        .start(LongBitmapActivity.this, PhotoPicker.REQUEST_CODE);
+//                PhotoPicker.builder()
+//                        .setPhotoCount(9)
+//                        .setShowCamera(true)
+//                        .setShowGif(true)
+//                        .setPreviewEnabled(false)
+//                        .start(LongBitmapActivity.this, PhotoPicker.REQUEST_CODE);
+                AsciiUtil.choosePhoto(this, 9, PictureConfig.CHOOSE_REQUEST);
                 break;
             default:
                 break;
@@ -96,11 +101,29 @@ public class LongBitmapActivity extends AppCompatActivity implements View.OnClic
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (resultCode == RESULT_OK && requestCode == PhotoPicker.REQUEST_CODE) {
-            if (null != data) {
-                ArrayList<String> photos = data.getStringArrayListExtra(PhotoPicker.KEY_SELECTED_PHOTOS);
-                compressPhoto(photos);
+        if (resultCode == RESULT_OK && requestCode == PictureConfig.CHOOSE_REQUEST) {
+//            if (null != data) {
+//                ArrayList<String> photos = data.getStringArrayListExtra(PhotoPicker.KEY_SELECTED_PHOTOS);
+//                compressPhoto(photos);
+//            }
+
+            List<LocalMedia> selectList = PictureSelector.obtainMultipleResult(data);
+            List<String> paths = new ArrayList<>();
+            if (selectList != null && selectList.size() > 0) {
+                for (int i = 0; i < selectList.size(); i++) {
+                    String path = "";
+                    LocalMedia localMedia = selectList.get(0);
+                    if (localMedia.isCompressed()) {
+                        path = localMedia.getCompressPath();
+                    } else if (localMedia.isCut()) {
+                        path = localMedia.getCutPath();
+                    } else {
+                        path = localMedia.getPath();
+                    }
+                    paths.add(path);
+                }
             }
+            compressPhoto(paths);
         }
     }
 
@@ -128,7 +151,7 @@ public class LongBitmapActivity extends AppCompatActivity implements View.OnClic
             if (null != mixBitmap) {
                 mixBitmaps.add(mixBitmap);
                 longHeights.add(mixBitmap.getHeight());
-                mHeight+=mixBitmap.getHeight();
+                mHeight += mixBitmap.getHeight();
             }
         }
         Bitmap bitmap = Bitmap.createBitmap(screenWidth, mHeight, Bitmap.Config.ARGB_4444);
@@ -138,7 +161,7 @@ public class LongBitmapActivity extends AppCompatActivity implements View.OnClic
             if (i == 0) {
                 canvas.drawBitmap(mixBitmaps.get(i), 0, 0, null);
             } else {
-                addHeight+=longHeights.get(i - 1);
+                addHeight += longHeights.get(i - 1);
                 canvas.drawBitmap(mixBitmaps.get(i), 0, addHeight, null);
             }
         }

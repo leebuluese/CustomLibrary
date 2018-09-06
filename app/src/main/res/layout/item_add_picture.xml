@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_marginRight="6dp"
+    android:background="#FFFFFF"
+    android:layout_width="62dp"
+    android:layout_height="62dp">
+
+    <ImageView
+        android:id="@+id/iv_picture"
+        android:background="@drawable/default_product_icon"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    
+    <ImageView
+        android:id="@+id/iv_delete"
+        android:src="@mipmap/tool_delete_pic"
+        android:layout_alignParentEnd="true"
+        android:layout_width="18dp"
+        android:layout_height="18dp" />
+</RelativeLayout>

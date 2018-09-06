@@ -4,7 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import com.lyz.lib.bitmap.BitmapActivity;
+import com.lyz.lib.bitmap.asciibitmap.AsciiBitmapActivity;
 import com.lyz.lib.bitmap.longbitmap.LongBitmapActivity;
+import com.lyz.lib.bitmap.printbitmap.PrintBitmapActivity;
 import com.lyz.lib.view.ViewActivity;
 
 /**
@@ -53,13 +55,13 @@ public class EventPath {
         } else if (name.equals(bitmap[position])) {
             switch (position) {
                 case 0:
-
+                    intent.setClass(context, PrintBitmapActivity.class);
                     break;
                 case 1:
                     intent.setClass(context, LongBitmapActivity.class);
                     break;
                 case 2:
-
+                    intent.setClass(context, AsciiBitmapActivity.class);
                     break;
                 default:
                     break;

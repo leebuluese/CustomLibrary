@@ -10,6 +10,7 @@
     <string-array name="list_bitmap">
         <item>图片水印</item>
         <item>长图拼接</item>
+        <item>字符图片</item>
         <item>view定位</item>
 
     </string-array>
