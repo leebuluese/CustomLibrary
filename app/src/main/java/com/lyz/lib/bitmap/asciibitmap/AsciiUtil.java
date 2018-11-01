@@ -39,6 +39,8 @@ import java.util.Locale;
 
 public class AsciiUtil {
 
+    private static final String TAG = "AsciiUtil";
+
     public static void choosePhoto(Activity context, int number, int requestCode) {
         PictureSelector.create(context)
                 .openGallery(PictureMimeType.ofImage())//全部.PictureMimeType.ofAll()、图片.ofImage()、视频.ofVideo()、音频.ofAudio()
@@ -84,40 +86,56 @@ public class AsciiUtil {
     }
 
 
-    public static Bitmap createAsciiPic(Bitmap image, Context context) {
+    public interface CallBackListener {
+        void onProgress(int progress);
+    }
+
+    public static Bitmap createAsciiPic(Bitmap image, Context context, CallBackListener listener) {
         // 字符串由复杂到简单
         final String base = "BXOHLTIiv;:,.";
         SpannableStringBuilder text = new SpannableStringBuilder();
-//        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-//        DisplayMetrics dm = new DisplayMetrics();
-//        if (wm != null) {
-//            wm.getDefaultDisplay().getMetrics(dm);
-//        }
-//        int width = dm.widthPixels;
-//        int height = dm.heightPixels;
-//        Bitmap image = BitmapFactory.decodeFile(path);  //读取图片
-//        int width0 = image.getWidth();
-//        int height0 = image.getHeight();
-//        int width1, height1;
-//        int scale = 7;
-//        if (width0 <= width / scale) {
-//            width1 = width0;
-//            height1 = height0;
-//        } else {
-//            width1 = width / scale;
-//            height1 = width1 * height0 / width0;
-//        }
-//        image = scale(path, width1, height1);  //读取图片
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        DisplayMetrics dm = new DisplayMetrics();
+        if (wm != null) {
+            wm.getDefaultDisplay().getMetrics(dm);
+        }
+        int width = dm.widthPixels;
+        int height = dm.heightPixels;
+
+        int width0 = image.getWidth();
+        int height0 = image.getHeight();
+        int width1, height1;
+        int scale = 7;
+        if (width0 <= width / scale) {
+            width1 = width0;
+            height1 = height0;
+        } else {
+            width1 = width / scale;
+            height1 = width1 * height0 / width0;
+        }
+        //读取图片
+        image = Bitmap.createScaledBitmap(image, width1, height1, true);
+        float imageHeight = image.getHeight();
+        int imageWidth = image.getWidth();
         //输出到指定文件中
-        for (int y = 0; y < image.getHeight(); y += 2) {
-            for (int x = 0; x < image.getWidth(); x++) {
+        for (int y = 0; y < imageHeight; y += 2) {
+            for (int x = 0; x < imageWidth; x++) {
                 final int pixel = image.getPixel(x, y);
                 final int r = (pixel & 0xff0000) >> 16, g = (pixel & 0xff00) >> 8, b = pixel & 0xff;
                 final float gray = 0.299f * r + 0.578f * g + 0.114f * b;
 //                final float gray = 0.2126f * r + 0.7152f * g + 0.0722f * b;
                 final int index = Math.round(gray * (base.length() + 1) / 255);
                 String s = index >= base.length() ? " " : String.valueOf(base.charAt(index));
+//                text.append(s);
                 text.append(getSpannable(s, pixel));
+
+//                Log.d(TAG, "x = " + x + " ; string = " + s);
+            }
+//            Log.d(TAG, "y = " + y + " ; width = " + image.getWidth() + " ; height = " + image.getHeight());
+            int progress = (int) ((y/imageHeight) * 100);
+            Log.d(TAG, "完成进度 ：" + progress + "%");
+            if (null != listener) {
+                listener.onProgress(progress);
             }
             text.append("\n");
         }
@@ -165,9 +183,7 @@ public class AsciiUtil {
         canvas.drawColor(Color.WHITE);
         layout.draw(canvas);
 
-        Log.d("textAsBitmap",
-
-                String.format("1:%d %d", layout.getWidth(), layout.getHeight()));
+        Log.d(TAG, String.format("1:%d %d", layout.getWidth(), layout.getHeight()));
 
         return bitmap;
 

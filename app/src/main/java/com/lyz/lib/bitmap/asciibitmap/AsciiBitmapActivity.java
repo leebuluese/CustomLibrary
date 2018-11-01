@@ -3,20 +3,23 @@ package com.lyz.lib.bitmap.asciibitmap;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
-
 import com.luck.picture.lib.PictureSelector;
 import com.luck.picture.lib.config.PictureConfig;
 import com.luck.picture.lib.entity.LocalMedia;
 import com.lyz.lib.R;
 import com.lyz.lib.util.FileUtil;
 import com.lyz.lib.util.LubanUtil;
+import com.lyz.lib.view.TestViewGroup;
+import com.lyz.lib.view.TextProgressBar;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,8 +33,9 @@ import java.util.List;
 public class AsciiBitmapActivity extends AppCompatActivity{
 
     private Bitmap bitmap; //  = BitmapFactory.decodeResource(getResources(), R.mipmap.ddd);
-    private ProgressBar pbProgress;
+    private TextProgressBar pbProgress;
     private ImageView ivImage;
+    private TestViewGroup tvg_custom;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -40,6 +44,14 @@ public class AsciiBitmapActivity extends AppCompatActivity{
         pbProgress = findViewById(R.id.pb_progress);
         ivImage = findViewById(R.id.iv_image);
         bitmap = BitmapFactory.decodeResource(getResources(), R.mipmap.ddd);
+
+        tvg_custom = findViewById(R.id.tvg_custom);
+        TextView textView = new TextView(this);
+        textView.setText("Hello Word!!!");
+        textView.setTextSize(28);
+        textView.setTextColor(Color.parseColor("#ffffff"));
+        tvg_custom.setBackgroundColor(0xff479341);
+        tvg_custom.addView(textView);
     }
 
     public void doPick(View view) {
@@ -72,7 +84,10 @@ public class AsciiBitmapActivity extends AppCompatActivity{
 //                imageView.setImageBitmap(BitmapFactory.decodeFile(filepath));
                 List<String> list = new ArrayList<>();
                 list.add(filepath);
-                compressPhoto(list);
+//                compressPhoto(list);
+                List<Bitmap> bt = new ArrayList<>();
+                bt.add(BitmapFactory.decodeFile(filepath));
+                refreshView(bt);
             }
 
         }
@@ -98,7 +113,18 @@ public class AsciiBitmapActivity extends AppCompatActivity{
         new Thread(new Runnable() {
             @Override
             public void run() {
-                bitmap = AsciiUtil.createAsciiPic(list.get(0), AsciiBitmapActivity.this);
+                bitmap = AsciiUtil.createAsciiPic(list.get(0), AsciiBitmapActivity.this, new AsciiUtil.CallBackListener() {
+                    @Override
+                    public void onProgress(final int progress) {
+                        pbProgress.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                pbProgress.setProgress(progress);
+                                Log.e("abc", "progress = " + progress);
+                            }
+                        });
+                    }
+                });
                 ivImage.post(new Runnable() {
                     @Override
                     public void run() {

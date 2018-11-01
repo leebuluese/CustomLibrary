@@ -1,4 +1,4 @@
-package com.lyz.lib.test;
+package com.lyz.lib;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

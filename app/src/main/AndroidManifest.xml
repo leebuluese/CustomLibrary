@@ -2,6 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.lyz.lib">
 
+
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
     <!-- 让设备给分配大的堆栈来处理Bitmap largeHeap -->
     <application
         android:allowBackup="true"
@@ -20,14 +26,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="me.iwf.photopicker.PhotoPickerActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.NoActionBar" />
-        <activity
-            android:name="me.iwf.photopicker.PhotoPagerActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.NoActionBar" />
+        <!--<activity-->
+            <!--android:name="me.iwf.photopicker.PhotoPickerActivity"-->
+            <!--android:screenOrientation="portrait"-->
+            <!--android:theme="@style/Theme.AppCompat.NoActionBar" />-->
+        <!--<activity-->
+            <!--android:name="me.iwf.photopicker.PhotoPagerActivity"-->
+            <!--android:screenOrientation="portrait"-->
+            <!--android:theme="@style/Theme.AppCompat.NoActionBar" />-->
         <activity
             android:name=".kotlin.KotlinJNIActivity"
             android:screenOrientation="portrait" />
@@ -45,6 +51,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".bitmap.asciibitmap.AsciiBitmapActivity"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
             android:screenOrientation="portrait" />
     </application>
 

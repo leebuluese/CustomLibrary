@@ -31,7 +31,12 @@
         android:src="@mipmap/bbb"
         android:scaleType="fitCenter" />
 
-    <ProgressBar
+    <com.lyz.lib.view.TestViewGroup
+        android:id="@+id/tvg_custom"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.lyz.lib.view.TextProgressBar
         android:id="@+id/pb_progress"
         android:visibility="invisible"
         style="?android:attr/progressBarStyle"

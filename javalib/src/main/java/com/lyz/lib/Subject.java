@@ -1,4 +1,4 @@
-package com.lyz.lib.test;
+package com.lyz.lib;
 
 /**
  * Created by lyz on 2018/8/31.
